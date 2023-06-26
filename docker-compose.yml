@@ -1,0 +1,19 @@
+version: '3'
+services:
+  frontend:
+    build:
+      context: ./mercor-frontend
+      dockerfile: Dockerfile.frontend
+    ports:
+      - 3010:3000  # Port mapping for the frontend application
+    depends_on:
+      - backend  # Specify that the frontend depends on the backend service
+
+  backend:
+    build:
+      context: ./mercor-backend
+      dockerfile: Dockerfile.backend
+    ports:
+      - 3510:3500 # Port mapping for the backend application
+    volumes:
+      - ./data:/app/data  
