@@ -29,3 +29,21 @@ jobs:
         run: docker push "${DOCKERHUB_USERNAME}/${{ github.event.repository.name }}-frontend:${{ github.run_number}}"
       - name: Push Backend Docker Image to DockerHub
         run: docker push "${DOCKERHUB_USERNAME}/${{ github.event.repository.name }}-backend:${{ github.run_number}}"
+  send-email:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      
+      - name: Send Email Notification
+        env:
+          SMTP_HOST: sandbox.smtp.mailtrap.io
+          SMTP_PORT: 587
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          TO_EMAIL: shivangrustagi04@gmail.com
+          FROM_EMAIL: rohanrustagi21@gmail.com
+        run: |
+          npm install -g smtpjs
+          smtpjs -t "$TO_EMAIL" -f "$FROM_EMAIL" -s "$SMTP_HOST" -p "$SMTP_PORT" -u "$SMTP_USERNAME" -pw "$SMTP_PASSWORD" -m "Your workflow has completed."
