@@ -18,14 +18,14 @@ jobs:
       - name: Build Frontend Docker Image
         run: |
           cd mercor-frontend
-          docker build -t "${DOCKERHUB_USERNAME}"/{{ GITHUB_REPOSITORY }}-frontend:${{ github.run_number}} .
+          docker build -t "${DOCKERHUB_USERNAME}/${{ github.repository }}-frontend:${{ github.run_number}}" .
       - name: Build Backend Docker Image
         run: |
           cd mercor-backend
-          docker build -t "${DOCKERHUB_USERNAME}"/{{ GITHUB_REPOSITORY }}-backend:${{ github.run_number}} .    
+          docker build -t "${DOCKERHUB_USERNAME}/${{ github.repository }}-backend:${{ github.run_number}}" .
       - name: Login to DockerHub
         run: echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
       - name: Push Frontend Docker Image to DockerHub
-        run: docker push "${DOCKERHUB_USERNAME}"/{{ GITHUB_REPOSITORY }}-frontend:${{ github.run_number}}
+        run: docker push "${DOCKERHUB_USERNAME}/${{ github.repository }}-frontend:${{ github.run_number}}"
       - name: Push Backend Docker Image to DockerHub
-        run: docker push "${DOCKERHUB_USERNAME}"/{{ GITHUB_REPOSITORY }}-backend:${{ github.run_number}}
+        run: docker push "${DOCKERHUB_USERNAME}/${{ github.repository }}-backend:${{ github.run_number}}"
