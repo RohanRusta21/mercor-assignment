@@ -29,9 +29,9 @@ jobs:
         run: docker push "${DOCKERHUB_USERNAME}/${{ github.event.repository.name }}-frontend:${{ github.run_number}}"
       - name: Push Backend Docker Image to DockerHub
         run: docker push "${DOCKERHUB_USERNAME}/${{ github.event.repository.name }}-backend:${{ github.run_number}}"
+
   send-email:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -45,5 +45,40 @@ jobs:
           TO_EMAIL: shivangrustagi04@gmail.com
           FROM_EMAIL: rohanrustagi21@gmail.com
         run: |
-          npm install -g smtpjs
-          smtpjs -t "$TO_EMAIL" -f "$FROM_EMAIL" -s "$SMTP_HOST" -p "$SMTP_PORT" -u "$SMTP_USERNAME" -pw "$SMTP_PASSWORD" -m "Your workflow has completed."
+          curl \
+            --ssl-reqd \
+            --url 'smtp://sandbox.smtp.mailtrap.io:2525' \
+            --user '${{ secrets.SMTP_USERNAME }}:${{ secrets.SMTP_PASSWORD }}' \
+            --mail-from ${{ env.FROM_EMAIL }} \
+            --mail-rcpt ${{ env.TO_EMAIL }} \
+            --upload-file - <<EOF
+            From: Magic Elves <${{ env.FROM_EMAIL }}>
+            To: Mailtrap Inbox <${{ env.TO_EMAIL }}>
+            Subject: You are awesome!
+            Content-Type: multipart/alternative; boundary="boundary-string"
+
+            --boundary-string
+            Content-Type: text/plain; charset="utf-8"
+            Content-Transfer-Encoding: quoted-printable
+            Content-Disposition: inline
+
+            Congrats for sending a test email with Mailtrap!
+
+            If you are viewing this email in your inbox, the integration works.
+            Now send your email using our SMTP server and integration of your choice!
+
+            Good luck! Hope it works.
+
+            --boundary-string
+            Content-Type: text/html; charset="utf-8"
+            Content-Transfer-Encoding: quoted-printable
+            Content-Disposition: inline
+
+            <!doctype html>
+            <html>
+              <head>
+                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+              </head>
+              <body style="font-family: sans-serif;">
+                <div style="display: block; margin: auto; max-width: 600px;" class="main">
+                  <h1 style="font-size: 18px; font-weight: bold; margin-top
