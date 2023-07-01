@@ -29,71 +29,22 @@ jobs:
         run: docker push "${DOCKERHUB_USERNAME}/${{ github.event.repository.name }}-frontend:${{ github.run_number}}"
       - name: Push Backend Docker Image to DockerHub
         run: docker push "${DOCKERHUB_USERNAME}/${{ github.event.repository.name }}-backend:${{ github.run_number}}"
-
-  send-email:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
       
-      - name: Send Email Notification
-        env:
-          SMTP_HOST: sandbox.smtp.mailtrap.io
-          SMTP_PORT: 587
-          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
-          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-          TO_EMAIL: shivangrustagi04@gmail.com
-          FROM_EMAIL: rohanrustagi21@gmail.com
+      - name: Run OWASP Dependency Check
         run: |
-          curl \
-            --ssl-reqd \
-            --url 'smtp://sandbox.smtp.mailtrap.io:2525' \
-            --user '${{ secrets.SMTP_USERNAME }}:${{ secrets.SMTP_PASSWORD }}' \
-            --mail-from ${{ env.FROM_EMAIL }} \
-            --mail-rcpt ${{ env.TO_EMAIL }} \
-            --upload-file - <<EOF
-            From: Magic Elves <${{ env.FROM_EMAIL }}>
-            To: Mailtrap Inbox <${{ env.TO_EMAIL }}>
-            Subject: You are awesome!
-            Content-Type: multipart/alternative; boundary="boundary-string"
+          wget https://github.com/jeremylong/DependencyCheck/releases/download/v6.4.0/dependency-check-6.4.0-release.zip
+          unzip dependency-check-6.4.0-release.zip
+          cd dependency-check/bin
+          ./dependency-check.sh --project "My Project" --scan <path-to-your-code>
 
-            --boundary-string
-            Content-Type: text/plain; charset="utf-8"
-            Content-Transfer-Encoding: quoted-printable
-            Content-Disposition: inline
+      - name: Generate OWASP Dependency Check report
+        run: |
+          cd dependency-check/bin
+          ./dependency-check.sh --project "My Project" --out reports --format HTML
 
-            Congrats for sending a test email with Mailtrap!
-
-            If you are viewing this email in your inbox, the integration works.
-            Now send your email using our SMTP server and integration of your choice!
-
-            Good luck! Hope it works.
-
-            --boundary-string
-            Content-Type: text/html; charset="utf-8"
-            Content-Transfer-Encoding: quoted-printable
-            Content-Disposition: inline
-
-            <!doctype html>
-            <html>
-              <head>
-                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-              </head>
-              <body style="font-family: sans-serif;">
-                <div style="display: block; margin: auto; max-width: 600px;" class="main">
-                  <h1 style="font-size: 18px; font-weight: bold; margin-top: 20px">Congrats for sending a test email with Mailtrap!</h1>
-                  <p>If you are viewing this email in your inbox, the integration works.</p>
-                  <img alt="Inspect with Tabs" src="https://assets-examples.mailtrap.io/integration-examples/welcome.png" style="width: 100%;">
-                  <p>Now send your email using our SMTP server and integration of your choice!</p>
-                  <p>Good luck! Hope it works.</p>
-                </div>
-                <!-- Example of invalid email HTML/CSS, will be detected by Mailtrap: -->
-                <style>
-                  .main { background-color: white; }
-                  a:hover { border-left-width: 1em; min-height: 2em; }
-                </style>
-              </body>
-            </html>
-
-            --boundary-string--
-            EOF
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: OWASP-Dependency-Check-Report
+          path: dependency-check/bin/reports
+  
