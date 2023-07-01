@@ -29,7 +29,7 @@ jobs:
         run: docker push "${DOCKERHUB_USERNAME}/${{ github.event.repository.name }}-frontend:${{ github.run_number}}"
       - name: Push Backend Docker Image to DockerHub
         run: docker push "${DOCKERHUB_USERNAME}/${{ github.event.repository.name }}-backend:${{ github.run_number}}"
-      
+
       - name: Run OWASP Dependency Check
         run: |
           wget https://github.com/jeremylong/DependencyCheck/releases/download/v6.4.0/dependency-check-6.4.0-release.zip
@@ -40,12 +40,10 @@ jobs:
       - name: Generate OWASP Dependency Check report
         run: |
           cd dependency-check/bin
-          ./dependency-check.sh --project "My Project" --out reports/ --format HTML
+          ./dependency-check.sh --project "My Project" --out ../../../reports/ --format HTML
 
       - name: Upload report artifact
         uses: actions/upload-artifact@v2
         with:
           name: OWASP-Dependency-Check-Report
           path: reports/
-          
-  
