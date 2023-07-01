@@ -40,7 +40,7 @@ jobs:
       - name: Generate OWASP Dependency Check report
         run: |
           cd dependency-check/bin
-          ./dependency-check.sh --project "My Project" --out reports --format HTML
+          ./dependency-check.sh --project "My Project" --out ./reports/ --format HTML
 
       - name: Upload report artifact
         uses: actions/upload-artifact@v2
