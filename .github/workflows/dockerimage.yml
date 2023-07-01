@@ -46,6 +46,6 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: OWASP-Dependency-Check-Report
-          path: dependency-check/bin/reports
+          path: ./reports/
           
   
