@@ -47,4 +47,5 @@ jobs:
         with:
           name: OWASP-Dependency-Check-Report
           path: dependency-check/bin/reports
+          run: mv dependency-check/bin/reports /Reports/
   
