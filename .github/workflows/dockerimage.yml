@@ -35,7 +35,7 @@ jobs:
           wget https://github.com/jeremylong/DependencyCheck/releases/download/v6.4.0/dependency-check-6.4.0-release.zip
           unzip dependency-check-6.4.0-release.zip
           cd dependency-check/bin
-          ./dependency-check.sh --project "My Project" --scan <path-to-your-code>
+          ./dependency-check.sh --project "My Project" --scan .
 
       - name: Generate OWASP Dependency Check report
         run: |
